@@ -43,7 +43,10 @@ export default function Signup() {
     if (!result.success) {
       setError(result.message || "Signup failed");
     } else {
-      navigate("/dashboard");
+      // Add a small delay to ensure state is updated
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 50);
     }
   };
 

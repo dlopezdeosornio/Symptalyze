@@ -1,21 +1,31 @@
 // src/pages/Dashboard.tsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import SymptomForm from "../components/SymptomForm";
 import SymptomList from "../components/SymptomList";
 import type{ SymptomEntry } from "../types/entry.data";
+import SymptomChart from "../components/SymptomChart";
+import ComparisonChart from "../components/ComparisonChart";
+import MedicationTracker from "../components/MedicationTracker";
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [entries, setEntries] = useState<SymptomEntry[]>([]);
 
-  // Load saved entries on mount
+  // Load saved entries on mount and clear when user changes
   useEffect(() => {
-    const saved = localStorage.getItem("symptom-entries");
-    if (saved) {
-      setEntries(JSON.parse(saved));
+    if (currentUser) {
+      const saved = localStorage.getItem("symptom-entries");
+      if (saved) {
+        setEntries(JSON.parse(saved));
+      }
+    } else {
+      // Clear entries when user logs out
+      setEntries([]);
     }
-  }, []);
+  }, [currentUser]);
 
   // Save entries whenever they change
   useEffect(() => {
@@ -24,6 +34,12 @@ export default function Dashboard() {
 
   const handleAddEntry = (entry: SymptomEntry) => {
     setEntries((prev) => [...prev, entry]);
+  };
+
+  const handleLogout = () => {
+    logout();
+    // Force navigation after logout
+    navigate("/");
   };
 
   return (
@@ -41,7 +57,7 @@ export default function Dashboard() {
               </p>
             </div>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors duration-200 font-medium"
             >
               Logout
@@ -49,7 +65,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Symptom Form */}
           <div className="lg:sticky lg:top-8">
             <SymptomForm onAdd={handleAddEntry} />
@@ -59,6 +75,24 @@ export default function Dashboard() {
           <div>
             <SymptomList entries={entries} />
           </div>
+        </div>
+
+        {/* Charts and Analytics Section */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+          {/* Variable Comparison Chart */}
+          <div>
+            <ComparisonChart entries={entries} />
+          </div>
+
+          {/* Medication Tracker */}
+          <div>
+            <MedicationTracker />
+          </div>
+        </div>
+
+        {/* Health Trends Chart - Full Width */}
+        <div className="w-full">
+          <SymptomChart entries={entries} />
         </div>
       </div>
     </div>

@@ -15,7 +15,10 @@ export default function Login() {
     if (!result.success) {
       setError(result.message || "Login failed");
     } else {
-      navigate("/dashboard");
+      // Add a small delay to ensure state is updated
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 50);
     }
   };
 
