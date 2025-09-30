@@ -1,21 +1,25 @@
-import { useLocalStorage } from "./hooks/useLocalStorage";
-import SymptomForm from "./components/SymptomForm";
-import SymptomList from "./components/SymptomList";
-import type{ SymptomEntry } from "./types/entry.data";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import AuthLanding from "./pages/AuthLanding";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  const [entries, setEntries] = useLocalStorage<SymptomEntry[]>("symptom-entries", []);
-
-  const handleAdd = (entry: SymptomEntry) => {
-    setEntries([...entries, entry]);
-  };
+  const { currentUser } = useAuth();
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Symptom Tracker</h1>
-      <SymptomForm onAdd={handleAdd} />
-      <SymptomList entries={entries} />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AuthLanding />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/dashboard"
+          element={currentUser ? <Dashboard /> : <Navigate to="/" />}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
