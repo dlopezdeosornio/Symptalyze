@@ -1,6 +1,6 @@
 // src/pages/Dashboard.tsx
 import { useState, useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import SymptomForm from "../components/SymptomForm";
 import SymptomList from "../components/SymptomList";
@@ -10,7 +10,7 @@ import ComparisonChart from "../components/ComparisonChart";
 import MedicationTracker from "../components/MedicationTracker";
 
 export default function Dashboard() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, navigationSource } = useAuth();
   const navigate = useNavigate();
   const [entries, setEntries] = useState<SymptomEntry[]>([]);
 
@@ -50,7 +50,10 @@ export default function Dashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Welcome back, {currentUser?.name || "User"}! 👋
+                {navigationSource === 'signup' 
+                  ? `Nice to meet you, ${currentUser?.firstName || "User"}! 👋`
+                  : `Welcome back, ${currentUser?.firstName || "User"}! 👋`
+                }
               </h1>
               <p className="text-gray-600">
                 Track your health and symptoms to better understand your patterns

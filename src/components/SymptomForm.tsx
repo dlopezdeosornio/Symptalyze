@@ -74,16 +74,33 @@ const SYMPTOM_OPTIONS = [
 
 export default function SymptomForm({ onAdd }: Props) {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [sleepHours, setSleepHours] = useState(8);
+  const [sleepHours, setSleepHours] = useState<string>("8");
   const [dietQuality, setDietQuality] = useState(3);
-  const [exerciseMinutes, setExerciseMinutes] = useState(0);
+  const [exerciseMinutes, setExerciseMinutes] = useState<string>("0");
   const [medications, setMedications] = useState("");
+  const [entryDateTime, setEntryDateTime] = useState(() => {
+    const now = new Date();
+    // Format to YYYY-MM-DDTHH:MM for datetime-local input
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  });
   
   // Dropdown states
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Input focus states for better UX
+  const [focusedInputs, setFocusedInputs] = useState({
+    sleepHours: false,
+    exerciseMinutes: false,
+    medications: false
+  });
 
   const toggleSymptom = (symptomId: string) => {
     setSelectedSymptoms(prev => 
@@ -138,19 +155,28 @@ export default function SymptomForm({ onAdd }: Props) {
     e.preventDefault();
     const newEntry: SymptomEntry = {
       id: crypto.randomUUID(),
-      date: new Date().toISOString(),
+      date: new Date(entryDateTime).toISOString(),
       symptoms: selectedSymptoms,
-      sleepHours,
+      sleepHours: Number(sleepHours) || 0,
       dietQuality,
-      exerciseMinutes,
+      exerciseMinutes: Number(exerciseMinutes) || 0,
       medications: medications.split(",").map(m => m.trim()).filter(Boolean),
     };
     onAdd(newEntry);
     setSelectedSymptoms([]);
-    setSleepHours(8);
+    setSleepHours("8");
     setDietQuality(3);
-    setExerciseMinutes(0);
+    setExerciseMinutes("0");
     setMedications("");
+    setFocusedInputs({ sleepHours: false, exerciseMinutes: false, medications: false });
+    // Reset to current date/time after submission
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    setEntryDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
   };
 
   return (
@@ -161,6 +187,20 @@ export default function SymptomForm({ onAdd }: Props) {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Date and Time */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            📅 Date & Time
+          </label>
+          <input
+            type="datetime-local"
+            value={entryDateTime}
+            onChange={(e) => setEntryDateTime(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          />
+          <p className="text-xs text-gray-500 mt-1">Select the date and time for this entry</p>
+        </div>
+
         {/* Symptoms */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -169,25 +209,39 @@ export default function SymptomForm({ onAdd }: Props) {
           
           {/* Selected symptoms display */}
           {selectedSymptoms.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {selectedSymptoms.map(symptomId => {
-                const symptom = SYMPTOM_OPTIONS.find(s => s.id === symptomId);
-                return (
-                  <span
-                    key={symptomId}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 border border-blue-200"
-                  >
-                    {symptom?.label}
-                    <button
-                      type="button"
-                      onClick={() => toggleSymptom(symptomId)}
-                      className="ml-2 text-blue-600 hover:text-blue-800"
+            <div className="mb-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">
+                  Selected Symptoms ({selectedSymptoms.length})
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSymptoms([])}
+                  className="text-xs text-red-600 hover:text-red-800 font-medium"
+                >
+                  Clear All
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedSymptoms.map(symptomId => {
+                  const symptom = SYMPTOM_OPTIONS.find(s => s.id === symptomId);
+                  return (
+                    <span
+                      key={symptomId}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-colors duration-200"
                     >
-                      ×
-                    </button>
-                  </span>
-                );
-              })}
+                      {symptom?.label}
+                      <button
+                        type="button"
+                        onClick={() => toggleSymptom(symptomId)}
+                        className="ml-2 text-blue-600 hover:text-blue-800 hover:bg-blue-300 rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -294,25 +348,55 @@ export default function SymptomForm({ onAdd }: Props) {
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             😴 Sleep Hours
           </label>
-          <div className="relative">
-            <input
-              type="number"
-              min="0"
-              max="24"
-              value={sleepHours}
-              onChange={(e) => setSleepHours(Number(e.target.value))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            />
-            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">hours</span>
+          <div className="flex items-center space-x-2">
+            <div className="relative flex-1">
+              <input
+                type="number"
+                min="0"
+                max="24"
+                step="0.5"
+                value={sleepHours}
+                onChange={(e) => setSleepHours(e.target.value)}
+                onFocus={() => setFocusedInputs(prev => ({ ...prev, sleepHours: true }))}
+                onBlur={() => setFocusedInputs(prev => ({ ...prev, sleepHours: false }))}
+                placeholder={focusedInputs.sleepHours ? "" : "8"}
+                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                style={{ 
+                  MozAppearance: 'textfield',
+                  WebkitAppearance: 'none'
+                }}
+              />
+            </div>
+            <span className="text-sm text-gray-500 font-medium min-w-[3rem]">hours</span>
           </div>
+          <p className="text-xs text-gray-500 mt-1">Enter hours of sleep (0-24)</p>
         </div>
 
         {/* Diet Quality */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
             🍎 Diet Quality
           </label>
-          <div className="flex items-center space-x-2">
+          <p className="text-xs text-gray-600 mb-3">
+            Rate the overall nutritional quality of your meals today
+          </p>
+          
+          {/* Value display above slider */}
+          <div className="flex justify-center mb-3">
+            <div className="flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+              <span className="text-xl font-bold text-blue-600">
+                {dietQuality}
+              </span>
+              <span className="text-sm font-medium text-blue-800">
+                {dietQuality === 1 ? 'Poor' : 
+                 dietQuality === 2 ? 'Fair' : 
+                 dietQuality === 3 ? 'Good' : 
+                 dietQuality === 4 ? 'Very Good' : 'Excellent'}
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-3">
             <input
               type="range"
               min="1"
@@ -320,10 +404,10 @@ export default function SymptomForm({ onAdd }: Props) {
               value={dietQuality}
               onChange={(e) => setDietQuality(Number(e.target.value))}
               className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+              style={{
+                background: `linear-gradient(to right, #ef4444 0%, #f97316 25%, #eab308 50%, #22c55e 75%, #10b981 100%)`
+              }}
             />
-            <span className="text-lg font-bold text-blue-600 min-w-[2rem] text-center">
-              {dietQuality}
-            </span>
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>Poor</span>
@@ -336,16 +420,27 @@ export default function SymptomForm({ onAdd }: Props) {
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             🏃 Exercise Minutes
           </label>
-          <div className="relative">
-            <input
-              type="number"
-              min="0"
-              value={exerciseMinutes}
-              onChange={(e) => setExerciseMinutes(Number(e.target.value))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            />
-            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">min</span>
+          <div className="flex items-center space-x-2">
+            <div className="relative flex-1">
+              <input
+                type="number"
+                min="0"
+                step="5"
+                value={exerciseMinutes}
+                onChange={(e) => setExerciseMinutes(e.target.value)}
+                onFocus={() => setFocusedInputs(prev => ({ ...prev, exerciseMinutes: true }))}
+                onBlur={() => setFocusedInputs(prev => ({ ...prev, exerciseMinutes: false }))}
+                placeholder={focusedInputs.exerciseMinutes ? "" : "0"}
+                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                style={{ 
+                  MozAppearance: 'textfield',
+                  WebkitAppearance: 'none'
+                }}
+              />
+            </div>
+            <span className="text-sm text-gray-500 font-medium min-w-[3rem]">min</span>
           </div>
+          <p className="text-xs text-gray-500 mt-1">Enter minutes of exercise (0 or more)</p>
         </div>
 
         {/* Medications */}
@@ -356,10 +451,12 @@ export default function SymptomForm({ onAdd }: Props) {
           <input
             value={medications}
             onChange={(e) => setMedications(e.target.value)}
+            onFocus={() => setFocusedInputs(prev => ({ ...prev, medications: true }))}
+            onBlur={() => setFocusedInputs(prev => ({ ...prev, medications: false }))}
             placeholder="e.g., ibuprofen, vitamin D, allergy meds"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
-          <p className="text-xs text-gray-500 mt-1">Separate multiple medications with commas</p>
+          <p className="text-xs text-gray-500 mt-1">Separate multiple medications with commas (optional)</p>
         </div>
 
         <button 

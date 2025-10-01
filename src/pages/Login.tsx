@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -15,10 +15,7 @@ export default function Login() {
     if (!result.success) {
       setError(result.message || "Login failed");
     } else {
-      // Add a small delay to ensure state is updated
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 50);
+      navigate("/dashboard");
     }
   };
 

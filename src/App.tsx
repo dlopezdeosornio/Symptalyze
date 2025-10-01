@@ -3,9 +3,9 @@ import AuthLanding from "./pages/AuthLanding";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import { useAuth } from "./hooks/useAuth";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
-function App() {
+function AppContent() {
   const { currentUser } = useAuth();
   
   // Debug logging
@@ -23,6 +23,14 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
