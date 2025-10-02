@@ -16,7 +16,7 @@ import {
   
   const variables = [
     { key: "sleepHours", label: "Sleep Hours" },
-    { key: "symptom", label: "Symptom (yes=1)" },
+    { key: "symptom", label: "Feeling fatigued" },
     { key: "exerciseMinutes", label: "Exercise Minutes" },
     { key: "dietQuality", label: "Diet Quality (1-5)" },
   ];

@@ -12,7 +12,7 @@ function AppContent() {
   console.log("App currentUser:", currentUser);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/Symptalyze">
       <Routes>
         <Route path="/" element={<AuthLanding />} />
         <Route path="/login" element={<Login />} />

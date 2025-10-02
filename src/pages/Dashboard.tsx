@@ -8,6 +8,7 @@ import type{ SymptomEntry } from "../types/entry.data";
 import SymptomChart from "../components/SymptomChart";
 import ComparisonChart from "../components/ComparisonChart";
 import MedicationTracker from "../components/MedicationTracker";
+import HealthAssistant from "../components/HealthAssistant";
 
 export default function Dashboard() {
   const { currentUser, logout, navigationSource } = useAuth();
@@ -67,6 +68,9 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
+
+        {/* Health Assistant */}
+        <HealthAssistant />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Symptom Form */}

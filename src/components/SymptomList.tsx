@@ -87,15 +87,19 @@ export default function SymptomList({ entries }: Props) {
                       </div>
                       
                       <div className="flex flex-wrap gap-2 mb-3">
-                        {entry.symptoms.slice(0, 3).map((symptom, index) => (
+                        {Array.isArray(entry.symptoms) ? entry.symptoms.slice(0, 3).map((symptom: string, index: number) => (
                           <span
                             key={index}
                             className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"
                           >
                             {symptom}
                           </span>
-                        ))}
-                        {entry.symptoms.length > 3 && (
+                        )) : (
+                          <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+                            {entry.symptoms}
+                          </span>
+                        )}
+                        {Array.isArray(entry.symptoms) && entry.symptoms.length > 3 && (
                           <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                             +{entry.symptoms.length - 3} more
                           </span>
@@ -135,14 +139,18 @@ export default function SymptomList({ entries }: Props) {
                           🩺 Symptoms
                         </h4>
                         <div className="flex flex-wrap gap-1">
-                          {entry.symptoms.map((symptom, index) => (
+                          {Array.isArray(entry.symptoms) ? entry.symptoms.map((symptom: string, index: number) => (
                             <span
                               key={index}
                               className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full"
                             >
                               {symptom}
                             </span>
-                          ))}
+                          )) : (
+                            <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+                              {entry.symptoms}
+                            </span>
+                          )}
                         </div>
                       </div>
 
