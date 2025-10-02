@@ -12,6 +12,62 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="W3Oc95mbxJejVV3i4xpmi";script.domain="www.chatbase.co";script.onload=function(){console.log('Chatbase script loaded successfully')};script.onerror=function(){console.error('Failed to load Chatbase script')};document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+      
+      // Enhanced chatbot integration for pre-filling questions
+      (function() {
+        // Function to handle pending questions
+        function handlePendingQuestion() {
+          const pendingQuestion = localStorage.getItem('pendingChatQuestion');
+          if (pendingQuestion) {
+            // Clear the pending question
+            localStorage.removeItem('pendingChatQuestion');
+            
+            // Wait a bit for the widget to be fully loaded
+            setTimeout(() => {
+              try {
+                // Try to find the chat input field and populate it
+                const chatInput = document.querySelector('[data-testid="chat-input"], .chat-input, input[placeholder*="message"], input[placeholder*="ask"], textarea[placeholder*="message"], textarea[placeholder*="ask"]');
+                if (chatInput) {
+                  chatInput.value = pendingQuestion;
+                  chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                  chatInput.dispatchEvent(new Event('change', { bubbles: true }));
+                  
+                  // Try to submit the form
+                  const chatForm = chatInput.closest('form');
+                  if (chatForm) {
+                    chatForm.dispatchEvent(new Event('submit', { bubbles: true }));
+                  }
+                } else {
+                  // Fallback: show the question in a user-friendly way
+                  console.log('Auto-fill not available. Question to ask:', pendingQuestion);
+                }
+              } catch (error) {
+                console.log('Could not auto-fill question:', error);
+              }
+            }, 2000);
+          }
+        }
+        
+        // Listen for chatbase widget events
+        window.addEventListener('message', function(event) {
+          if (event.data && event.data.type === 'chatbase-widget-ready') {
+            handlePendingQuestion();
+          }
+        });
+        
+        // Also check periodically for pending questions when widget might be ready
+        let checkCount = 0;
+        const maxChecks = 10;
+        const checkInterval = setInterval(() => {
+          checkCount++;
+          if (window.chatbase && window.chatbase('getState') === 'initialized') {
+            handlePendingQuestion();
+            clearInterval(checkInterval);
+          } else if (checkCount >= maxChecks) {
+            clearInterval(checkInterval);
+          }
+        }, 1000);
+      })();
     </script>
   </body>
 </html>
