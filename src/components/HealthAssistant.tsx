@@ -19,9 +19,15 @@ const HealthAssistant: React.FC<HealthAssistantProps> = ({ className = '' }) => 
   const handleAskQuestion = (question: string) => {
     // This would trigger the chatbot to open with the specific question
     if (window.chatbase) {
-      window.chatbase('open');
-      // Note: You might need to implement a way to pre-fill the question
-      // depending on your Chatbase.co setup
+      try {
+        window.chatbase('open');
+        console.log('Question to ask:', question);
+      } catch (error) {
+        console.error('Error opening chatbot:', error);
+        // Fallback: could show an alert or redirect to a contact form
+      }
+    } else {
+      console.warn('Chatbase widget not available');
     }
   };
 
