@@ -25,15 +25,18 @@ import {
     const [var1, setVar1] = useState("sleepHours");
     const [var2, setVar2] = useState("exerciseMinutes");
   
-    const chartData = entries.map((e) => ({
-      date: new Date(e.date).toLocaleDateString(),
-      sleepHours: Number(e.sleepHours) || 0,
-      exerciseMinutes: Number(e.exerciseMinutes) || 0,
-      dietQuality: Number(e.dietQuality) || 0,
-      symptom: Array.isArray(e.symptoms) 
-        ? e.symptoms.some(s => s.toLowerCase().includes("fatigue")) ? 1 : 0
-        : e.symptoms.toLowerCase().includes("fatigue") ? 1 : 0, // example mapping
-    }));
+    const chartData = entries
+      .map((e) => ({
+        date: new Date(e.date).toLocaleDateString(),
+        dateValue: new Date(e.date), // Keep original date for sorting
+        sleepHours: Number(e.sleepHours) || 0,
+        exerciseMinutes: Number(e.exerciseMinutes) || 0,
+        dietQuality: Number(e.dietQuality) || 0,
+        symptom: Array.isArray(e.symptoms) 
+          ? e.symptoms.some(s => s.toLowerCase().includes("fatigue")) ? 1 : 0
+          : e.symptoms.toLowerCase().includes("fatigue") ? 1 : 0, // example mapping
+      }))
+      .sort((a, b) => a.dateValue.getTime() - b.dateValue.getTime()); // Sort by date ascending
   
   const getVariableLabel = (key: string) => {
     return variables.find(v => v.key === key)?.label || key;
@@ -47,6 +50,25 @@ import {
       dietQuality: "🍎"
     };
     return icons[key] || "📊";
+  };
+
+  const getYAxisLabel = (var1: string, var2: string) => {
+    const labels = {
+      sleepHours: "Hours",
+      exerciseMinutes: "Minutes", 
+      dietQuality: "Quality (1-5)",
+      symptom: "Fatigue (0-1)"
+    };
+    
+    const label1 = labels[var1 as keyof typeof labels] || "";
+    const label2 = labels[var2 as keyof typeof labels] || "";
+    
+    if (label1 === label2) {
+      return label1;
+    }
+    
+    // If different units, show both
+    return `${label1} / ${label2}`;
   };
 
   if (entries.length === 0) {
@@ -145,10 +167,12 @@ import {
               dataKey="date" 
               tick={{ fontSize: 12, fill: '#666' }}
               axisLine={{ stroke: '#e0e0e0' }}
+              label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fill: '#666' } }}
             />
             <YAxis 
               tick={{ fontSize: 12, fill: '#666' }}
               axisLine={{ stroke: '#e0e0e0' }}
+              label={{ value: getYAxisLabel(var1, var2), angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666' } }}
             />
             <Tooltip 
               contentStyle={{

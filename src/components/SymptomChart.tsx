@@ -14,16 +14,19 @@ import {
   }
   
 export default function SymptomChart({ entries }: Props) {
-  // Prepare data for chart
-  const chartData = entries.map((e) => ({
-    date: new Date(e.date).toLocaleDateString(),
-    sleep: Number(e.sleepHours),
-    diet: Number(e.dietQuality),
-    exercise: Number(e.exerciseMinutes),
-    fatigue: Array.isArray(e.symptoms) 
-      ? e.symptoms.some(s => s.toLowerCase().includes("fatigue")) ? 1 : 0
-      : e.symptoms.toLowerCase().includes("fatigue") ? 1 : 0,
-  }));
+  // Prepare data for chart and sort by date
+  const chartData = entries
+    .map((e) => ({
+      date: new Date(e.date).toLocaleDateString(),
+      dateValue: new Date(e.date), // Keep original date for sorting
+      sleep: Number(e.sleepHours),
+      diet: Number(e.dietQuality),
+      exercise: Number(e.exerciseMinutes),
+      fatigue: Array.isArray(e.symptoms) 
+        ? e.symptoms.some(s => s.toLowerCase().includes("fatigue")) ? 1 : 0
+        : e.symptoms.toLowerCase().includes("fatigue") ? 1 : 0,
+    }))
+    .sort((a, b) => a.dateValue.getTime() - b.dateValue.getTime()); // Sort by date ascending
 
   if (entries.length === 0) {
     return (
@@ -55,10 +58,12 @@ export default function SymptomChart({ entries }: Props) {
                 dataKey="date" 
                 tick={{ fontSize: 12, fill: '#666' }}
                 axisLine={{ stroke: '#e0e0e0' }}
+                label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fill: '#666' } }}
               />
               <YAxis 
                 tick={{ fontSize: 12, fill: '#666' }}
                 axisLine={{ stroke: '#e0e0e0' }}
+                label={{ value: 'Hours / Fatigue (0-1)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666' } }}
               />
               <Tooltip 
                 contentStyle={{
@@ -102,11 +107,13 @@ export default function SymptomChart({ entries }: Props) {
                 dataKey="date" 
                 tick={{ fontSize: 12, fill: '#666' }}
                 axisLine={{ stroke: '#e0e0e0' }}
+                label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fill: '#666' } }}
               />
               <YAxis 
                 domain={[0, 5]}
                 tick={{ fontSize: 12, fill: '#666' }}
                 axisLine={{ stroke: '#e0e0e0' }}
+                label={{ value: 'Diet Quality (1-5)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666' } }}
               />
               <Tooltip 
                 contentStyle={{
@@ -141,10 +148,12 @@ export default function SymptomChart({ entries }: Props) {
                 dataKey="date" 
                 tick={{ fontSize: 12, fill: '#666' }}
                 axisLine={{ stroke: '#e0e0e0' }}
+                label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fill: '#666' } }}
               />
               <YAxis 
                 tick={{ fontSize: 12, fill: '#666' }}
                 axisLine={{ stroke: '#e0e0e0' }}
+                label={{ value: 'Exercise (minutes)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666' } }}
               />
               <Tooltip 
                 contentStyle={{

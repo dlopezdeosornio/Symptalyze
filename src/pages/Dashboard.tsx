@@ -9,6 +9,7 @@ import SymptomChart from "../components/SymptomChart";
 import ComparisonChart from "../components/ComparisonChart";
 import MedicationTracker from "../components/MedicationTracker";
 import HealthAssistant from "../components/HealthAssistant";
+import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function Dashboard() {
   const { currentUser, logout, navigationSource } = useAuth();
@@ -45,6 +46,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Chatbot Widget - Only available in Dashboard */}
+      <ChatbotWidget entries={entries} />
+      
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
