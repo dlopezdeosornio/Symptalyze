@@ -1,28 +1,41 @@
 import { useState, useEffect } from "react";
 import type { Medication } from "../types/medications";
+import { useAuth } from "../hooks/useAuth";
+import { getUserStorage, setUserStorage, STORAGE_KEYS } from "../utils/storage";
 
 export default function MedicationTracker() {
+  const { currentUser } = useAuth();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [newMed, setNewMed] = useState({ name: "", time: "" });
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   // Load meds from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("medications");
-    if (saved) {
-      const parsedMedications = JSON.parse(saved);
-      // Ensure all medications have weeklyStatus property
-      const medicationsWithWeeklyStatus = parsedMedications.map((med: Medication) => ({
-        ...med,
-        weeklyStatus: med.weeklyStatus || {}
-      }));
-      setMedications(medicationsWithWeeklyStatus);
+    if (currentUser) {
+      const saved = getUserStorage<Medication[]>(STORAGE_KEYS.MEDICATIONS, currentUser.email);
+      if (saved) {
+        // Ensure all medications have weeklyStatus property
+        const medicationsWithWeeklyStatus = saved.map((med: Medication) => ({
+          ...med,
+          weeklyStatus: med.weeklyStatus || {}
+        }));
+        setMedications(medicationsWithWeeklyStatus);
+      } else {
+        setMedications([]);
+      }
+      setIsDataLoaded(true);
+    } else {
+      setMedications([]);
+      setIsDataLoaded(false);
     }
-  }, []);
+  }, [currentUser]);
 
-  // Save meds when updated
+  // Save meds when updated (but not on initial load)
   useEffect(() => {
-    localStorage.setItem("medications", JSON.stringify(medications));
-  }, [medications]);
+    if (currentUser && isDataLoaded) {
+      setUserStorage(STORAGE_KEYS.MEDICATIONS, currentUser.email, medications);
+    }
+  }, [medications, currentUser, isDataLoaded]);
 
   const addMedication = () => {
     if (!newMed.name || !newMed.time) return;

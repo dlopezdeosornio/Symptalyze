@@ -60,8 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setCurrentUser(null);
     setNavigationSource(null);
-    // Clear symptom entries from localStorage when user logs out
-    localStorage.removeItem("symptom-entries");
+    // Note: User-specific data is now stored with user email keys, 
+    // so no need to clear global storage on logout
   };
 
   const value: AuthContextType = {

@@ -10,29 +10,33 @@ import ComparisonChart from "../components/ComparisonChart";
 import MedicationTracker from "../components/MedicationTracker";
 import HealthAssistant from "../components/HealthAssistant";
 import ChatbotWidget from "../components/ChatbotWidget";
+import { getUserStorage, setUserStorage, STORAGE_KEYS } from "../utils/storage";
 
 export default function Dashboard() {
   const { currentUser, logout, navigationSource } = useAuth();
   const navigate = useNavigate();
   const [entries, setEntries] = useState<SymptomEntry[]>([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   // Load saved entries on mount and clear when user changes
   useEffect(() => {
     if (currentUser) {
-      const saved = localStorage.getItem("symptom-entries");
-      if (saved) {
-        setEntries(JSON.parse(saved));
-      }
+      const saved = getUserStorage<SymptomEntry[]>(STORAGE_KEYS.SYMPTOM_ENTRIES, currentUser.email);
+      setEntries(saved || []);
+      setIsDataLoaded(true);
     } else {
       // Clear entries when user logs out
       setEntries([]);
+      setIsDataLoaded(false);
     }
   }, [currentUser]);
 
-  // Save entries whenever they change
+  // Save entries whenever they change (but not on initial load)
   useEffect(() => {
-    localStorage.setItem("symptom-entries", JSON.stringify(entries));
-  }, [entries]);
+    if (currentUser && isDataLoaded) {
+      setUserStorage(STORAGE_KEYS.SYMPTOM_ENTRIES, currentUser.email, entries);
+    }
+  }, [entries, currentUser, isDataLoaded]);
 
   const handleAddEntry = (entry: SymptomEntry) => {
     setEntries((prev) => [...prev, entry]);
