@@ -3,13 +3,12 @@ import AuthLanding from "./pages/AuthLanding";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthProvider";
+import { useAuth } from "./hooks/useAuth";
 
 function AppContent() {
   const { currentUser } = useAuth();
   
-  // Debug logging
-  console.log("App currentUser:", currentUser);
 
   return (
     <BrowserRouter basename="/Symptalyze">

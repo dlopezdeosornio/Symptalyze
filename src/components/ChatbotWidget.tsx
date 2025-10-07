@@ -1,39 +1,36 @@
 import { useEffect } from 'react';
 
 interface ChatbotWidgetProps {
-  entries: any[];
+  entries: unknown[];
 }
 
 const ChatbotWidget: React.FC<ChatbotWidgetProps> = () => {
   useEffect(() => {
-    // Check if script already exists to prevent duplicates
     const existingScript = document.getElementById('chatbase-script');
     if (existingScript) {
-      console.log('Chatbase script already exists');
       return;
     }
 
-    // Load Chatbase script exactly as it was originally
     const script = document.createElement("script");
     script.src = "https://www.chatbase.co/embed.min.js";
     script.id = "chatbase-script";
     script.setAttribute("chatbotId", "W3Oc95mbxJejVV3i4xpmi");
     script.setAttribute("domain", "www.chatbase.co");
     
+    // Ensure the script loads and initializes properly
     script.onload = () => {
-      console.log('Chatbase script loaded successfully');
+      // Widget loaded successfully
     };
     
     script.onerror = () => {
-      console.error('Failed to load Chatbase script');
+      console.error('Failed to load Chatbase widget');
     };
-    
-    document.body.appendChild(script);
-    console.log('Chatbase script added to page');
 
-    // Don't remove script on cleanup to preserve widget functionality
+    document.body.appendChild(script);
+
     return () => {
-      console.log('ChatbotWidget cleanup - preserving script');
+      // Don't remove the script on unmount to preserve widget state
+      // The widget needs to maintain its state (open/closed) across component re-renders
     };
   }, []);
 

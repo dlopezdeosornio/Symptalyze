@@ -1,6 +1,6 @@
 // src/pages/Dashboard.tsx
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import SymptomForm from "../components/SymptomForm";
 import SymptomList from "../components/SymptomList";
@@ -46,7 +46,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Chatbot Widget - Only available in Dashboard */}
+      {/* Chatbot Widget */}
       <ChatbotWidget entries={entries} />
       
       <div className="max-w-6xl mx-auto px-4 py-8">

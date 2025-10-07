@@ -84,6 +84,13 @@
   font-size: 1.1rem;
 }
 
+.questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
 .sample-questions ul {
   list-style: none;
   padding: 0;
@@ -117,6 +124,27 @@
 .question-button:focus {
   outline: 2px solid #667eea;
   outline-offset: 2px;
+}
+
+.chat-info {
+  margin: 25px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  border-radius: 12px;
+  border: 2px solid #e1bee7;
+}
+
+.chat-info h4 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+}
+
+.chat-info p {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .assistant-features h4 {
@@ -166,6 +194,105 @@
   font-weight: 600;
 }
 
+/* Copy Notification Styles */
+.copy-notification {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  animation: slideInLeft 0.3s ease-out;
+  pointer-events: auto;
+}
+
+.copy-notification-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 400px;
+  min-width: 300px;
+  position: relative;
+  z-index: 10000;
+}
+
+.copy-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.copy-message {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.copy-message strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.copy-message p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.85rem;
+}
+
+.copy-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.copy-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive notification */
+@media (max-width: 768px) {
+  .copy-notification {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+  }
+  
+  .copy-notification-content {
+    max-width: none;
+    min-width: auto;
+    padding: 14px 16px;
+  }
+  
+  .copy-message {
+    font-size: 0.85rem;
+  }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .health-assistant-toggle {
@@ -193,6 +320,10 @@
     grid-template-columns: 1fr;
   }
   
+  .questions-grid {
+    grid-template-columns: 1fr;
+  }
+  
   .question-button {
     padding: 10px 12px;
     font-size: 0.85rem;
@@ -214,86 +345,3 @@
   }
 }
 
-/* Toast Notification Styles */
-.toast-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  animation: slideInRight 0.3s ease-out;
-}
-
-.toast-content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  max-width: 400px;
-  min-width: 300px;
-}
-
-.toast-icon {
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.toast-message {
-  flex: 1;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.toast-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-  flex-shrink: 0;
-}
-
-.toast-close:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Responsive toast */
-@media (max-width: 768px) {
-  .toast-notification {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-  }
-  
-  .toast-content {
-    max-width: none;
-    min-width: auto;
-    padding: 14px 16px;
-  }
-  
-  .toast-message {
-    font-size: 0.85rem;
-  }
-}
