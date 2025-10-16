@@ -89,9 +89,6 @@ describe('Login', () => {
     const signupLink = screen.getByText('Sign up here')
     await user.click(signupLink)
 
-    // Navigate back to login (simulate navigation)
-    render(<LoginWithProviders />)
-
     const emailInput = screen.getByLabelText(/Email Address/i)
     const passwordInput = screen.getByLabelText(/Password/i)
     const submitButton = screen.getByRole('button', { name: /Sign In/i })

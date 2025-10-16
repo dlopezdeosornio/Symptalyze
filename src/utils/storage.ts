@@ -46,7 +46,7 @@ export const removeUserStorage = (baseKey: string, userEmail: string): void => {
 /**
  * Storage keys for different types of user data
  */
-export const STORAGE_KEYS = {
+export const STORAGE_KEYS = Object.freeze({
   SYMPTOM_ENTRIES: 'symptom-entries',
   MEDICATIONS: 'medications',
-} as const;
+});

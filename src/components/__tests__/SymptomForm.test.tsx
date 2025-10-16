@@ -34,8 +34,8 @@ describe('SymptomForm', () => {
     const exerciseInput = screen.getByLabelText(/Exercise Minutes/i)
     const medicationsInput = screen.getByLabelText(/Medications/i)
 
-    expect(sleepInput).toHaveValue('8')
-    expect(exerciseInput).toHaveValue('0')
+    expect(sleepInput).toHaveValue(8)
+    expect(exerciseInput).toHaveValue(0)
     expect(medicationsInput).toHaveValue('')
   })
 
@@ -147,13 +147,12 @@ describe('SymptomForm', () => {
 
     await user.type(medicationsInput, 'ibuprofen, vitamin D')
 
-    expect(sleepInput).toHaveValue('7.5')
-    expect(exerciseInput).toHaveValue('45')
+    expect(sleepInput).toHaveValue(7.5)
+    expect(exerciseInput).toHaveValue(45)
     expect(medicationsInput).toHaveValue('ibuprofen, vitamin D')
   })
 
-  it('should update diet quality slider', async () => {
-    const user = userEvent.setup()
+  it('should update diet quality slider', () => {
     render(<SymptomForm onAdd={mockOnAdd} />)
 
     const dietSlider = screen.getByRole('slider')
@@ -162,11 +161,11 @@ describe('SymptomForm', () => {
     expect(dietValue).toHaveTextContent('3')
     expect(screen.getByText('Good')).toBeInTheDocument()
 
-    // Change slider value
-    await user.type(dietSlider, '{arrowright}{arrowright}')
+    // Change slider value using fireEvent
+    fireEvent.change(dietSlider, { target: { value: '5' } })
 
     expect(screen.getByText('5')).toBeInTheDocument()
-    expect(screen.getByText('Excellent')).toBeInTheDocument()
+    expect(screen.getByText('Excellent', { selector: 'span.text-sm.font-medium.text-blue-800' })).toBeInTheDocument()
   })
 
   it('should submit form with correct data', async () => {
@@ -223,8 +222,8 @@ describe('SymptomForm', () => {
 
     // Form should be reset
     expect(screen.queryByText('Selected Symptoms (1)')).not.toBeInTheDocument()
-    expect(screen.getByLabelText(/Sleep Hours/i)).toHaveValue('8')
-    expect(screen.getByLabelText(/Exercise Minutes/i)).toHaveValue('0')
+    expect(screen.getByLabelText(/Sleep Hours/i)).toHaveValue(8)
+    expect(screen.getByLabelText(/Exercise Minutes/i)).toHaveValue(0)
     expect(screen.getByLabelText(/Medications/i)).toHaveValue('')
   })
 
@@ -269,15 +268,19 @@ describe('SymptomForm', () => {
 
     // Test other values by changing slider
     fireEvent.change(dietSlider, { target: { value: '1' } })
-    expect(screen.getByText('Poor')).toBeInTheDocument()
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.getByText('Poor', { selector: 'span.text-sm.font-medium.text-blue-800' })).toBeInTheDocument()
 
     fireEvent.change(dietSlider, { target: { value: '2' } })
-    expect(screen.getByText('Fair')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByText('Fair', { selector: 'span.text-sm.font-medium.text-blue-800' })).toBeInTheDocument()
 
     fireEvent.change(dietSlider, { target: { value: '4' } })
-    expect(screen.getByText('Very Good')).toBeInTheDocument()
+    expect(screen.getByText('4')).toBeInTheDocument()
+    expect(screen.getByText('Very Good', { selector: 'span.text-sm.font-medium.text-blue-800' })).toBeInTheDocument()
 
     fireEvent.change(dietSlider, { target: { value: '5' } })
-    expect(screen.getByText('Excellent')).toBeInTheDocument()
+    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText('Excellent', { selector: 'span.text-sm.font-medium.text-blue-800' })).toBeInTheDocument()
   })
 })

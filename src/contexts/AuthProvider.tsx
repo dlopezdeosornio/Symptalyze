@@ -10,15 +10,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Load users and currentUser from localStorage on mount
   useEffect(() => {
-    const savedUsers = localStorage.getItem("users");
-    const savedCurrentUser = localStorage.getItem("currentUser");
-    
-    if (savedUsers) {
-      setUsers(JSON.parse(savedUsers));
-    }
-    
-    if (savedCurrentUser) {
-      setCurrentUser(JSON.parse(savedCurrentUser));
+    try {
+      const savedUsers = localStorage.getItem("users");
+      const savedCurrentUser = localStorage.getItem("currentUser");
+      const savedNavigationSource = localStorage.getItem("navigationSource");
+      
+      if (savedUsers) {
+        setUsers(JSON.parse(savedUsers));
+      }
+      
+      if (savedCurrentUser) {
+        setCurrentUser(JSON.parse(savedCurrentUser));
+      }
+      
+      if (savedNavigationSource) {
+        setNavigationSource(savedNavigationSource as 'login' | 'signup');
+      }
+    } catch (error) {
+      // Handle malformed localStorage data gracefully
+      console.error("Error loading user data from localStorage:", error);
+      // Clear the malformed data
+      localStorage.removeItem("users");
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("navigationSource");
     }
   }, []);
 

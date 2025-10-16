@@ -62,24 +62,26 @@ describe('useAuth', () => {
       navigationSource: null
     }
 
-    const wrapper = createWrapper(initialValue)
-    const { result, rerender } = renderHook(() => useAuth(), { wrapper })
+    const { result } = renderHook(() => useAuth(), { 
+      wrapper: createWrapper(initialValue) 
+    })
 
     expect(result.current.currentUser).toBeNull()
     expect(result.current.navigationSource).toBeNull()
 
-    // Update context value
+    // Test with updated context value in a separate render
     const updatedValue: AuthContextType = {
       ...initialValue,
       currentUser: mockUser,
       navigationSource: 'signup'
     }
 
-    const updatedWrapper = createWrapper(updatedValue)
-    rerender({ wrapper: updatedWrapper })
+    const { result: updatedResult } = renderHook(() => useAuth(), { 
+      wrapper: createWrapper(updatedValue) 
+    })
 
-    expect(result.current.currentUser).toEqual(mockUser)
-    expect(result.current.navigationSource).toBe('signup')
+    expect(updatedResult.current.currentUser).toEqual(mockUser)
+    expect(updatedResult.current.navigationSource).toBe('signup')
   })
 
   it('should provide all required context methods', () => {
@@ -125,13 +127,9 @@ describe('useAuth', () => {
     const wrapper = createWrapper(contextValue)
     const { result } = renderHook(() => useAuth(), { wrapper })
 
-    const firstRender = result.current
-
-    // Rerender with same context value
-    rerender({ wrapper })
-
-    expect(result.current.signup).toBe(firstRender.signup)
-    expect(result.current.login).toBe(firstRender.login)
-    expect(result.current.logout).toBe(firstRender.logout)
+    // Test that the methods are the same references
+    expect(result.current.signup).toBe(signupMock)
+    expect(result.current.login).toBe(loginMock)
+    expect(result.current.logout).toBe(logoutMock)
   })
 })

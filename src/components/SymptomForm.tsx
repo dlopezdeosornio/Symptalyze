@@ -189,10 +189,11 @@ export default function SymptomForm({ onAdd }: Props) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Date and Time */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="entryDateTime" className="block text-sm font-semibold text-gray-700 mb-2">
             📅 Date & Time
           </label>
           <input
+            id="entryDateTime"
             type="datetime-local"
             value={entryDateTime}
             onChange={(e) => setEntryDateTime(e.target.value)}
@@ -203,7 +204,7 @@ export default function SymptomForm({ onAdd }: Props) {
 
         {/* Symptoms */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="symptoms" className="block text-sm font-semibold text-gray-700 mb-2">
             🩺 Symptoms
           </label>
           
@@ -250,6 +251,7 @@ export default function SymptomForm({ onAdd }: Props) {
             {/* Search input and dropdown trigger */}
             <div className="flex">
               <input
+                id="symptoms"
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -345,12 +347,13 @@ export default function SymptomForm({ onAdd }: Props) {
 
         {/* Sleep Hours */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="sleepHours" className="block text-sm font-semibold text-gray-700 mb-2">
             😴 Sleep Hours
           </label>
           <div className="flex items-center space-x-2">
             <div className="relative flex-1">
               <input
+                id="sleepHours"
                 type="number"
                 min="0"
                 max="24"
@@ -374,7 +377,7 @@ export default function SymptomForm({ onAdd }: Props) {
 
         {/* Diet Quality */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label htmlFor="dietQuality" className="block text-sm font-semibold text-gray-700 mb-1">
             🍎 Diet Quality
           </label>
           <p className="text-xs text-gray-600 mb-3">
@@ -398,6 +401,7 @@ export default function SymptomForm({ onAdd }: Props) {
           
           <div className="flex items-center space-x-3">
             <input
+              id="dietQuality"
               type="range"
               min="1"
               max="5"
@@ -417,12 +421,13 @@ export default function SymptomForm({ onAdd }: Props) {
 
         {/* Exercise Minutes */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="exerciseMinutes" className="block text-sm font-semibold text-gray-700 mb-2">
             🏃 Exercise Minutes
           </label>
           <div className="flex items-center space-x-2">
             <div className="relative flex-1">
               <input
+                id="exerciseMinutes"
                 type="number"
                 min="0"
                 step="5"
@@ -445,10 +450,11 @@ export default function SymptomForm({ onAdd }: Props) {
 
         {/* Medications */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="medications" className="block text-sm font-semibold text-gray-700 mb-2">
             💊 Medications
           </label>
           <input
+            id="medications"
             value={medications}
             onChange={(e) => setMedications(e.target.value)}
             onFocus={() => setFocusedInputs(prev => ({ ...prev, medications: true }))}

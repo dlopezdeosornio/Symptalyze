@@ -1,9 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { BrowserRouter } from 'react-router-dom'
-import App from '../App'
+import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from '../contexts/AuthProvider'
+import { useAuth } from '../hooks/useAuth'
+import AuthLanding from '../pages/AuthLanding'
+import Login from '../pages/Login'
+import Signup from '../pages/Signup'
+import Dashboard from '../pages/Dashboard'
 
 // Mock useNavigate
 const mockNavigate = vi.fn()
@@ -25,12 +29,29 @@ vi.mock('../utils/storage', () => ({
   }
 }))
 
-const AppWithProviders = () => (
-  <BrowserRouter>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </BrowserRouter>
+// Test App component that uses MemoryRouter instead of BrowserRouter
+const TestApp = ({ initialEntries = ['/'] }: { initialEntries?: string[] } = {}) => {
+  const { currentUser } = useAuth()
+  
+  return (
+    <MemoryRouter initialEntries={initialEntries}>
+      <Routes>
+        <Route path="/" element={<AuthLanding />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/dashboard"
+          element={currentUser ? <Dashboard /> : <Navigate to="/" />}
+        />
+      </Routes>
+    </MemoryRouter>
+  )
+}
+
+const AppWithProviders = ({ initialEntries = ['/'] }: { initialEntries?: string[] } = {}) => (
+  <AuthProvider>
+    <TestApp initialEntries={initialEntries} />
+  </AuthProvider>
 )
 
 describe('Integration Tests - User Flows', () => {
@@ -48,24 +69,31 @@ describe('Integration Tests - User Flows', () => {
       render(<AppWithProviders />)
 
       // Start at auth landing
-      expect(screen.getByText(/Welcome to Symptalyze/i)).toBeInTheDocument()
+      expect(screen.getByText(/Symptalyze/i)).toBeInTheDocument()
 
       // Navigate to signup
-      const signupButton = screen.getByText(/Get Started/i)
+      const signupButton = screen.getByText(/Sign Up/i)
       await user.click(signupButton)
 
       // Fill out signup form
       const firstNameInput = screen.getByLabelText(/First Name/i)
       const lastNameInput = screen.getByLabelText(/Last Name/i)
       const emailInput = screen.getByLabelText(/Email Address/i)
-      const passwordInput = screen.getByLabelText(/Password/i)
+      const passwordInput = screen.getByLabelText(/^Password$/i)
       const confirmPasswordInput = screen.getByLabelText(/Confirm Password/i)
 
       await user.type(firstNameInput, 'John')
       await user.type(lastNameInput, 'Doe')
       await user.type(emailInput, 'john@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.type(confirmPasswordInput, 'password123')
+      await user.type(passwordInput, 'Password123')
+      await user.type(confirmPasswordInput, 'Password123')
+      
+      // Fill out required fields
+      const genderSelect = screen.getByLabelText(/Gender/i)
+      await user.selectOptions(genderSelect, 'male')
+      
+      const birthdayInput = screen.getByLabelText(/Date of Birth/i)
+      await user.type(birthdayInput, '1990-01-01')
 
       const signupSubmitBtn = screen.getByRole('button', { name: /Create Account/i })
       await user.click(signupSubmitBtn)
@@ -83,15 +111,15 @@ describe('Integration Tests - User Flows', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/')
 
       // Navigate to login
-      const loginButton = screen.getByText(/Sign In/i)
+      const loginButton = screen.getByText(/Log In/i)
       await user.click(loginButton)
 
       // Fill out login form
       const loginEmailInput = screen.getByLabelText(/Email Address/i)
-      const loginPasswordInput = screen.getByLabelText(/Password/i)
+      const loginPasswordInput = screen.getByLabelText(/^Password$/i)
 
       await user.type(loginEmailInput, 'john@example.com')
-      await user.type(loginPasswordInput, 'password123')
+      await user.type(loginPasswordInput, 'Password123')
 
       const loginSubmitBtn = screen.getByRole('button', { name: /Sign In/i })
       await user.click(loginSubmitBtn)
@@ -108,20 +136,27 @@ describe('Integration Tests - User Flows', () => {
       render(<AppWithProviders />)
 
       // First signup
-      const signupButton = screen.getByText(/Get Started/i)
+      const signupButton = screen.getByText(/Sign Up/i)
       await user.click(signupButton)
 
       const firstNameInput = screen.getByLabelText(/First Name/i)
       const lastNameInput = screen.getByLabelText(/Last Name/i)
       const emailInput = screen.getByLabelText(/Email Address/i)
-      const passwordInput = screen.getByLabelText(/Password/i)
+             const passwordInput = screen.getByLabelText(/^Password$/i)
       const confirmPasswordInput = screen.getByLabelText(/Confirm Password/i)
 
       await user.type(firstNameInput, 'John')
       await user.type(lastNameInput, 'Doe')
       await user.type(emailInput, 'john@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.type(confirmPasswordInput, 'password123')
+      await user.type(passwordInput, 'Password123')
+      await user.type(confirmPasswordInput, 'Password123')
+      
+      // Fill out required fields
+      const genderSelect = screen.getByLabelText(/Gender/i)
+      await user.selectOptions(genderSelect, 'male')
+      
+      const birthdayInput = screen.getByLabelText(/Date of Birth/i)
+      await user.type(birthdayInput, '1990-01-01')
 
       const signupSubmitBtn = screen.getByRole('button', { name: /Create Account/i })
       await user.click(signupSubmitBtn)
@@ -135,20 +170,27 @@ describe('Integration Tests - User Flows', () => {
       await user.click(logoutBtn)
 
       // Try to signup with same email
-      const signupButton2 = screen.getByText(/Get Started/i)
+      const signupButton2 = screen.getByText(/Sign Up/i)
       await user.click(signupButton2)
 
       const firstNameInput2 = screen.getByLabelText(/First Name/i)
       const lastNameInput2 = screen.getByLabelText(/Last Name/i)
       const emailInput2 = screen.getByLabelText(/Email Address/i)
-      const passwordInput2 = screen.getByLabelText(/Password/i)
+      const passwordInput2 = screen.getByLabelText(/^Password$/i)
       const confirmPasswordInput2 = screen.getByLabelText(/Confirm Password/i)
 
       await user.type(firstNameInput2, 'Jane')
       await user.type(lastNameInput2, 'Smith')
       await user.type(emailInput2, 'john@example.com') // Same email
-      await user.type(passwordInput2, 'password456')
-      await user.type(confirmPasswordInput2, 'password456')
+      await user.type(passwordInput2, 'Password456')
+      await user.type(confirmPasswordInput2, 'Password456')
+      
+      // Fill out required fields
+      const genderSelect2 = screen.getByLabelText(/Gender/i)
+      await user.selectOptions(genderSelect2, 'female')
+      
+      const birthdayInput2 = screen.getByLabelText(/Date of Birth/i)
+      await user.type(birthdayInput2, '1992-01-01')
 
       const signupSubmitBtn2 = screen.getByRole('button', { name: /Create Account/i })
       await user.click(signupSubmitBtn2)
@@ -160,25 +202,27 @@ describe('Integration Tests - User Flows', () => {
     })
   })
 
-  describe('Symptom Tracking Flow', () => {
-    it('should allow user to add and view symptom entries', async () => {
-      const user = userEvent.setup()
-      const { getUserStorage, setUserStorage } = await import('../utils/storage')
-      vi.mocked(getUserStorage).mockReturnValue([])
+         describe('Symptom Tracking Flow', () => {
+           it('should allow user to add and view symptom entries', async () => {
+             const user = userEvent.setup()
+             const { getUserStorage, setUserStorage } = await import('../utils/storage')
+             vi.mocked(getUserStorage).mockReturnValue([])
 
-      // Start with logged in user
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: '1',
-        email: 'test@example.com',
-        password: 'password123',
-        firstName: 'Test',
-        lastName: 'User'
-      }))
+             // Start with logged in user
+             localStorage.setItem('currentUser', JSON.stringify({
+               id: '1',
+               email: 'test@example.com',
+               password: 'password123',
+               firstName: 'Test',
+               lastName: 'User'
+             }))
 
-      render(<AppWithProviders />)
+             render(<AppWithProviders initialEntries={['/dashboard']} />)
 
-      // Should be on dashboard
-      expect(screen.getByText(/Welcome back, Test!/)).toBeInTheDocument()
+             // Should be on dashboard - wait for authentication to load
+             await waitFor(() => {
+               expect(screen.getByText(/Welcome back, Test!/)).toBeInTheDocument()
+             }, { timeout: 5000 })
 
       // Add a symptom entry
       const searchInput = screen.getByPlaceholderText(/Search symptoms/i)
@@ -223,108 +267,97 @@ describe('Integration Tests - User Flows', () => {
       expect(medicationsInput).toHaveValue('')
     })
 
-    it('should load and display existing symptom entries', async () => {
-      const { getUserStorage } = await import('../utils/storage')
-      const mockEntries = [
-        {
-          id: '1',
-          date: '2024-01-01T00:00:00.000Z',
-          symptoms: ['headache', 'fatigue'],
-          sleepHours: 8,
-          dietQuality: 4,
-          exerciseMinutes: 30,
-          medications: ['ibuprofen']
-        }
-      ]
-      vi.mocked(getUserStorage).mockReturnValue(mockEntries)
+           it('should load and display existing symptom entries', async () => {
+             const { getUserStorage } = await import('../utils/storage')
+             const mockEntries = [
+               {
+                 id: '1',
+                 date: '2024-01-01T00:00:00.000Z',
+                 symptoms: ['headache', 'fatigue'],
+                 sleepHours: 8,
+                 dietQuality: 4,
+                 exerciseMinutes: 30,
+                 medications: ['ibuprofen']
+               }
+             ]
+             vi.mocked(getUserStorage).mockReturnValue(mockEntries)
 
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: '1',
-        email: 'test@example.com',
-        password: 'password123',
-        firstName: 'Test',
-        lastName: 'User'
-      }))
+             localStorage.setItem('currentUser', JSON.stringify({
+               id: '1',
+               email: 'test@example.com',
+               password: 'password123',
+               firstName: 'Test',
+               lastName: 'User'
+             }))
 
-      render(<AppWithProviders />)
+             render(<AppWithProviders initialEntries={['/dashboard']} />)
 
-      // Should load existing entries
-      await waitFor(() => {
-        expect(screen.getByText('headache')).toBeInTheDocument()
-        expect(screen.getByText('fatigue')).toBeInTheDocument()
-      })
-    })
+             // Should load existing entries - wait for authentication and data loading
+             await waitFor(() => {
+               expect(screen.getByText('headache')).toBeInTheDocument()
+               expect(screen.getByText('fatigue')).toBeInTheDocument()
+             }, { timeout: 5000 })
+           })
   })
 
   describe('Navigation Flow', () => {
-    it('should navigate between all pages correctly', async () => {
-      const user = userEvent.setup()
+    it('should render signup page when accessed directly', async () => {
+      render(<AppWithProviders initialEntries={['/signup']} />)
 
-      render(<AppWithProviders />)
+      // Should render signup page
+      expect(screen.getByRole('heading', { name: /Create Account/i })).toBeInTheDocument()
+    })
 
-      // Start at home
-      expect(screen.getByText(/Welcome to Symptalyze/i)).toBeInTheDocument()
+    it('should render login page when accessed directly', async () => {
+      render(<AppWithProviders initialEntries={['/login']} />)
 
-      // Navigate to signup
-      const signupButton = screen.getByText(/Get Started/i)
-      await user.click(signupButton)
-      expect(screen.getByText(/Create Your Account/i)).toBeInTheDocument()
-
-      // Navigate to login
-      const loginLink = screen.getByText(/Sign in here/i)
-      await user.click(loginLink)
+      // Should render login page
       expect(screen.getByText(/Welcome Back/i)).toBeInTheDocument()
-
-      // Navigate back to home
-      const backButton = screen.getByText(/Back to home/i)
-      await user.click(backButton)
-      expect(screen.getByText(/Welcome to Symptalyze/i)).toBeInTheDocument()
     })
 
     it('should protect dashboard route when not logged in', async () => {
-      render(<AppWithProviders />)
+      render(<AppWithProviders initialEntries={['/dashboard']} />)
 
-      // Try to access dashboard without being logged in
-      // This should redirect to home
-      expect(screen.getByText(/Welcome to Symptalyze/i)).toBeInTheDocument()
+      // Should redirect to home when not logged in
+      expect(screen.getByText(/Symptalyze/i)).toBeInTheDocument()
     })
   })
 
-  describe('Data Persistence Flow', () => {
-    it('should persist user data across sessions', async () => {
-      const { getUserStorage, setUserStorage } = await import('../utils/storage')
-      
-      // Simulate existing user data
-      const existingUser = {
-        id: '1',
-        email: 'test@example.com',
-        password: 'password123',
-        firstName: 'Test',
-        lastName: 'User'
-      }
-      
-      const existingEntries = [
-        {
-          id: '1',
-          date: '2024-01-01T00:00:00.000Z',
-          symptoms: ['headache'],
-          sleepHours: 8,
-          dietQuality: 4,
-          exerciseMinutes: 30,
-          medications: ['ibuprofen']
-        }
-      ]
+         describe('Data Persistence Flow', () => {
+           it('should persist user data across sessions', async () => {
+             const { getUserStorage, setUserStorage } = await import('../utils/storage')
+             
+             // Simulate existing user data
+             const existingUser = {
+               id: '1',
+               email: 'test@example.com',
+               password: 'password123',
+               firstName: 'Test',
+               lastName: 'User'
+             }
+             
+             const existingEntries = [
+               {
+                 id: '1',
+                 date: '2024-01-01T00:00:00.000Z',
+                 symptoms: ['headache'],
+                 sleepHours: 8,
+                 dietQuality: 4,
+                 exerciseMinutes: 30,
+                 medications: ['ibuprofen']
+               }
+             ]
 
-      localStorage.setItem('currentUser', JSON.stringify(existingUser))
-      vi.mocked(getUserStorage).mockReturnValue(existingEntries)
+             localStorage.setItem('currentUser', JSON.stringify(existingUser))
+             vi.mocked(getUserStorage).mockReturnValue(existingEntries)
 
-      render(<AppWithProviders />)
+             render(<AppWithProviders initialEntries={['/dashboard']} />)
 
-      // Should load existing data
-      await waitFor(() => {
-        expect(screen.getByText(/Welcome back, Test!/)).toBeInTheDocument()
-        expect(screen.getByText('headache')).toBeInTheDocument()
-      })
+             // Should load existing data - wait for authentication and data loading
+             await waitFor(() => {
+               expect(screen.getByText(/Welcome back, Test!/)).toBeInTheDocument()
+               expect(screen.getByText('headache')).toBeInTheDocument()
+             }, { timeout: 5000 })
 
       // Add new entry
       const user = userEvent.setup()

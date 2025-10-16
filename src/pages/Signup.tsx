@@ -49,7 +49,7 @@ export default function Signup() {
     password: { isValid: false, message: "" },
     confirmPassword: { isValid: false, message: "" },
     age: { isValid: false, message: "" },
-    gender: { isValid: false, message: "" },
+    gender: { isValid: false, message: "Please select your gender" },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -246,7 +246,7 @@ export default function Signup() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* First Name field */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">First Name</label>
+              <label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,6 +254,7 @@ export default function Signup() {
                   </svg>
                 </div>
                 <input
+                  id="firstName"
                   name="firstName"
                   type="text"
                   placeholder="Enter your first name"
@@ -269,7 +270,7 @@ export default function Signup() {
 
             {/* Last Name field */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Last Name</label>
+              <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Last Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,6 +278,7 @@ export default function Signup() {
                   </svg>
                 </div>
                 <input
+                  id="lastName"
                   name="lastName"
                   type="text"
                   placeholder="Enter your last name"
@@ -292,7 +294,7 @@ export default function Signup() {
 
             {/* Gender field */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Gender</label>
+              <label htmlFor="gender" className="text-sm font-medium text-gray-700">Gender</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,6 +302,7 @@ export default function Signup() {
                   </svg>
                 </div>
                 <select
+                  id="gender"
                   name="gender"
                   className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none ${
                     form.gender ? 
@@ -323,12 +326,12 @@ export default function Signup() {
                   </svg>
                 </div>
               </div>
-              {hasAttemptedSubmit && <ValidationMessage validation={validation.gender} />}
+              <ValidationMessage validation={validation.gender} />
             </div>
 
             {/* Birthday field */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Date of Birth</label>
+              <label htmlFor="birthday" className="text-sm font-medium text-gray-700">Date of Birth</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -336,6 +339,7 @@ export default function Signup() {
                   </svg>
                 </div>
                 <input
+                  id="birthday"
                   name="birthday"
                   type="date"
                   className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm ${
@@ -355,7 +359,7 @@ export default function Signup() {
 
             {/* Email field */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Email Address</label>
+              <label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,6 +367,7 @@ export default function Signup() {
                   </svg>
                 </div>
                 <input
+                  id="email"
                   name="email"
                   type="email"
                   placeholder="Enter your email"
@@ -383,7 +388,7 @@ export default function Signup() {
 
             {/* Password field */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -391,6 +396,7 @@ export default function Signup() {
                   </svg>
                 </div>
                 <input
+                  id="password"
                   name="password"
                   type="password"
                   placeholder="Create a password"
@@ -411,7 +417,7 @@ export default function Signup() {
 
             {/* Confirm Password field */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -419,6 +425,7 @@ export default function Signup() {
                   </svg>
                 </div>
                 <input
+                  id="confirmPassword"
                   name="confirmPassword"
                   type="password"
                   placeholder="Confirm your password"
@@ -440,8 +447,6 @@ export default function Signup() {
             {/* Submit button */}
             <button 
               type="submit"
-              disabled={!validation.email.isValid || !validation.password.isValid || 
-                       !validation.confirmPassword.isValid || !validation.age.isValid || !validation.gender.isValid}
               onClick={(e) => {
                 if (!validation.email.isValid || !validation.password.isValid || 
                     !validation.confirmPassword.isValid || !validation.age.isValid || !validation.gender.isValid) {
